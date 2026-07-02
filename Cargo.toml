@@ -1,0 +1,17 @@
+[package]
+name = "lsm6dsox"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[features]
+defmt = ["dep:defmt"]
+
+[dev-dependencies]
+pollster = "0.3"
+
+[dependencies]
+defmt = { version = "1", optional = true }
+device-driver = { git = "https://github.com/diondokter/device-driver", rev="ce9aa65802e6ed66274c7f00fd53fa9cb45aaed2", features = ["macros"] }
+embedded-hal-async = "1.0.0"
+thiserror = { version = "2.0.3", default-features = false }

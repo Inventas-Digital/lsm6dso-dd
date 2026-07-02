@@ -1,0 +1,593 @@
+
+device Device {
+    byte-order: LE,
+    register-address-type: u8,
+    register-address-mode: mapped,
+    buffer-address-type: u8,
+
+    register FUNC_CFG_ACCESS {
+        address: 0x01,
+        access: RW,
+        fields: fieldset FuncCfgAccessFields {
+            size-bytes: 1,
+            field shub_reg_access 6:6 -> bool,
+            field func_cfg_access 7:7 -> bool,
+        },
+        reset: 0,
+    },
+
+    register WHO_AM_I {
+        address: 0x0F,
+        access: RO,
+        fields: fieldset WhoAmI {
+            size-bytes: 1,
+            field who_am_i 7:0 -> u8,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    enum GyroOdr {
+        PowerDown:     0b0000,
+        Rate_12_5_Hz:  0b0001,
+        Rate_26_Hz:    0b0010,
+        Rate_52_Hz:    0b0011,
+        Rate_104_Hz:   0b0100,
+        Rate_208_Hz:   0b0101,
+        Rate_416_Hz:   0b0110,
+        Rate_833_Hz:   0b0111,
+        Rate_1660_Hz:  0b1000,
+        Rate_3330_Hz:  0b1001,
+        Rate_6660_Hz:  0b1010,
+        infallible: catch-all 0b1100,
+    },
+
+    enum GyroFullScale {
+        Scale_250_Dps:  0b00,
+        Scale_500_Dps:  0b01,
+        Scale_1000_Dps:  0b10,
+        Scale_2000_Dps:  0b11,
+    },
+
+    enum BatchDataRate {
+        NotBatched:   0b0000,
+        Rate_12_5_Hz: 0b0001,
+        Rate_26_Hz:   0b0010,
+        Rate_52_Hz:   0b0011,
+        Rate_104_Hz:  0b0100,
+        Rate_208_Hz:  0b0101,
+        Rate_417_Hz:  0b0110,
+        Rate_833_Hz:  0b0111,
+        Rate_1667_Hz: 0b1000,
+        Rate_3333_Hz: 0b1001,
+        Rate_6667_Hz: 0b1010,
+        Rate_6_5_Hz:  0b1011,
+        infallible: catch-all 0b1100,
+    },
+
+    register FIFO_CTRL3 {
+        address: 0x09,
+        access: RW,
+        fields: fieldset FifoCtrl3Fields {
+            size-bytes: 1,
+            field bdr_xl 3:0 -> u8 as BatchDataRate,
+            field bdr_gy 7:4 -> u8 as BatchDataRate,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    enum FifoMode {
+        Bypass:             0b000,
+        Fifo:               0b001,
+        ContinuousToFifo:   0b011,
+        BypassToContinuous: 0b100,
+        Continuous:         0b110,
+        BypassToFifo:       0b111,
+        infallible: catch-all 0b010,
+    },
+
+    enum TemperatureBatchRate {
+        Disabled:     0,
+        Rate_1_6_Hz:  1,
+        Rate_12_5_Hz: 2,
+        Rate_52_Hz:   3,
+    },
+
+    enum TimestampDecimation {
+        Disabled:  0,
+        Factor1:   1,
+        Factor8:   2,
+        Factor32:  3,
+    },
+
+    register FIFO_CTRL1 {
+        address: 0x07,
+        access: RW,
+        fields: fieldset FifoCtrl1Fields {
+            size-bytes: 1,
+            field watermark_threshold 7:0 -> u8,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    enum UncompressedRate {
+        NotForced: 0,
+        Every8:    1,
+        Every16:   2,
+        Every32:   3,
+    },
+
+    register FIFO_CTRL2 {
+        address: 0x08,
+        access: RW,
+        fields: fieldset FifoCtrl2Fields {
+            size-bytes: 1,
+            field wtm_8            0:0 -> bool,
+            field uncoptr_rate     2:1 -> u8 as UncompressedRate,
+            field odrchg_en        4:4 -> bool,
+            field fifo_compr_rt_en 6:6 -> bool,
+            field stop_on_wtm      7:7 -> bool,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register FIFO_CTRL4 {
+        address: 0x0A,
+        access: RW,
+        fields: fieldset FifoCtrl4Fields {
+            size-bytes: 1,
+            field fifo_mode    2:0 -> u8 as FifoMode,
+            field odr_t_batch  5:4 -> u8 as TemperatureBatchRate,
+            field odr_ts_batch 7:6 -> u8 as TimestampDecimation,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    enum AccelOdr {
+        PowerDown:    0b0000,
+        Rate_1_6_Hz:  0b1011,
+        Rate_12_5_Hz: 0b0001,
+        Rate_26_Hz:   0b0010,
+        Rate_52_Hz:   0b0011,
+        Rate_104_Hz:  0b0100,
+        Rate_208_Hz:  0b0101,
+        Rate_416_Hz:  0b0110,
+        Rate_833_Hz:  0b0111,
+        Rate_1660_Hz: 0b1000,
+        Rate_3330_Hz: 0b1001,
+        Rate_6660_Hz: 0b1010,
+        infallible: catch-all 0b1100,
+    },
+
+    enum AccelFullScale {
+        Scale_2g:  0b00,
+        Scale_16g: 0b01,
+        Scale_4g:  0b10,
+        Scale_8g:  0b11,
+    },
+
+    register CTRL1_XL {
+        address: 0x10,
+        access: RW,
+        fields: fieldset Ctrl1XlFields {
+            size-bytes: 1,
+            field lpf2_xl_en 1:1 -> bool,
+            field fs_xl      3:2 -> u8 as AccelFullScale,
+            field odr_xl     7:4 -> u8 as AccelOdr,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    enum AuxSensors {
+        One:   0b00,
+        Two:   0b01,
+        Three: 0b10,
+        Four:  0b11,
+    },
+
+    fieldset SensorHubFields {
+        size-bytes: 1,
+        field data 7:0 -> u8,
+    },
+
+    register SENSOR_HUB1  { address: 0x02, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB2  { address: 0x03, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB3  { address: 0x04, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB4  { address: 0x05, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB5  { address: 0x06, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB6  { address: 0x07, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB7  { address: 0x08, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB8  { address: 0x09, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB9  { address: 0x0A, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB10 { address: 0x0B, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB11 { address: 0x0C, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB12 { address: 0x0D, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB13 { address: 0x0E, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB14 { address: 0x0F, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB15 { address: 0x10, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB16 { address: 0x11, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB17 { address: 0x12, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+    register SENSOR_HUB18 { address: 0x13, access: RO, fields: SensorHubFields, reset: 0, address-overlap: allow },
+
+    enum ShubTrigger {
+        DataReady: 0,
+        Int2Pin:   1,
+    },
+
+    register MASTER_CONFIG {
+        address: 0x14,
+        access: RW,
+        fields: fieldset MasterConfigFields {
+            size-bytes: 1,
+            field aux_sens_on       1:0 -> u8 as AuxSensors,
+            field master_on         2:2 -> bool,
+            field shub_pu_en        3:3 -> bool,
+            field pass_through_mode 4:4 -> bool,
+            field start_config      5:5 -> u8 as ShubTrigger,
+            field write_once        6:6 -> bool,
+            field rst_master_regs   7:7 -> bool,
+        },
+        reset: 0,
+    },
+
+    enum ShubOdr {
+        Rate_104_Hz:  0b00,
+        Rate_52_Hz:   0b01,
+        Rate_26_Hz:   0b10,
+        Rate_12_5_Hz: 0b11,
+    },
+
+    fieldset Slv0AddFields {
+        size-bytes: 1,
+        field rw_0       0:0 -> bool,
+        field slave0_add 7:1 -> u8,
+    },
+
+    fieldset SlvAddFields {
+        size-bytes: 1,
+        field r_1       0:0 -> bool,
+        field slave_add 7:1 -> u8,
+    },
+
+    register SLV0_ADD {
+        address: 0x15,
+        access: RW,
+        fields: Slv0AddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    fieldset SlvSubaddFields {
+        size-bytes: 1,
+        field slave_reg 7:0 -> u8,
+    },
+
+    register SLV0_SUBADD {
+        address: 0x16,
+        access: RW,
+        fields: SlvSubaddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV0_CONFIG {
+        address: 0x17,
+        access: RW,
+        fields: fieldset Slv0ConfigFields {
+            size-bytes: 1,
+            field slave_numop       2:0 -> u8,
+            field batch_ext_sens_en 3:3 -> bool,
+            field shub_odr           7:6 -> u8 as ShubOdr,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV1_ADD {
+        address: 0x18,
+        access: RW,
+        fields: SlvAddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV1_SUBADD {
+        address: 0x19,
+        access: RW,
+        fields: SlvSubaddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    fieldset SlvConfigFields {
+        size-bytes: 1,
+        field slave_numop     2:0 -> u8,
+        field batch_ext_sens_en 3:3 -> bool,
+    },
+
+    register SLV1_CONFIG {
+        address: 0x1A,
+        access: RW,
+        fields: SlvConfigFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV2_ADD {
+        address: 0x1B,
+        access: RW,
+        fields: SlvAddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV2_SUBADD {
+        address: 0x1C,
+        access: RW,
+        fields: SlvSubaddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV2_CONFIG {
+        address: 0x1D,
+        access: RW,
+        fields: SlvConfigFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV3_ADD {
+        address: 0x1E,
+        access: RW,
+        fields: SlvAddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV3_SUBADD {
+        address: 0x1F,
+        access: RW,
+        fields: SlvSubaddFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register SLV3_CONFIG {
+        address: 0x20,
+        access: RW,
+        fields: SlvConfigFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register STATUS_MASTER {
+        address: 0x22,
+        access: RO,
+        fields: StatusMasterMainpageFields,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register CTRL3_C {
+        address: 0x12,
+        access: RW,
+        fields: fieldset Ctrl3CFields {
+            size-bytes: 1,
+            field sw_reset  0:0 -> bool,
+            field if_inc    2:2 -> bool,
+            field sim       3:3 -> bool,
+            field pp_od     4:4 -> bool,
+            field h_lactive 5:5 -> bool,
+            field bdu       6:6 -> bool,
+            field boot      7:7 -> bool,
+        },
+        reset: 0x04,
+        address-overlap: allow,
+    },
+
+    register CTRL10_C {
+        address: 0x19,
+        access: RW,
+        fields: fieldset Ctrl10CFields {
+            size-bytes: 1,
+            field timestamp_en 5:5 -> bool,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register CTRL2_G {
+        address: 0x11,
+        access: RW,
+        address-overlap: allow,
+
+        fields: fieldset CTRL2_G_Fields {
+            size-bytes: 1,
+            field ODR 7:4 -> u8 as GyroOdr,
+            field FS_G 3:2 -> u8 as GyroFullScale,
+            field FS_125 1:1 -> bool,
+        }
+    },
+
+    register STATUS_REG {
+        address: 0x1E,
+        access: RO,
+
+        fields: fieldset StatusRegFields {
+            size-bytes: 1,
+            field xlda 0:0 -> bool,
+            field gda 1:1 -> bool,
+            field tda 2:2 -> bool,
+        },
+        address-overlap: allow,
+    },
+
+    fieldset Measurement {
+        size-bytes: 2,
+        field value 15:0 -> i16,
+    },
+
+    register OUTX_G {
+        address: 0x22,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register OUTY_G {
+        address: 0x24,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+    },
+
+    register OUTZ_G {
+        address: 0x26,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+    },
+
+    register OUTX_XL {
+        address: 0x28,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+    },
+
+    register OUTY_XL {
+        address: 0x2A,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+    },
+
+    register OUTZ_XL {
+        address: 0x2C,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+    },
+
+    register OUT_TEMP {
+        address: 0x20,
+        access: RO,
+        fields: fieldset TempFieldSet {
+            size-bytes: 2,
+            field temp 15:0 -> int,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register STATUS_MASTER_MAINPAGE {
+        address: 0x39,
+        access: RO,
+        fields: fieldset StatusMasterMainpageFields {
+            size-bytes: 1,
+            field sens_hub_endop 0:0 -> bool,
+            field slave0_nack    3:3 -> bool,
+            field slave1_nack    4:4 -> bool,
+            field slave2_nack    5:5 -> bool,
+            field slave3_nack    6:6 -> bool,
+            field wr_once_done   7:7 -> bool,
+        },
+        reset: 0,
+    },
+
+    enum SensorTag {
+        GyroNc:          1,
+        XlNc:            2,
+        Temperature:     3,
+        Timestamp:       4,
+        CfgChange:       5,
+        XlNcT2:          6,
+        XlNcT1:          7,
+        Xl2xc:           8,
+        Xl3xc:           9,
+        GyroNcT2:       10,
+        GyroNcT1:       11,
+        Gyro2xc:        12,
+        Gyro3xc:        13,
+        SensorhubSlave0: 14,
+        SensorhubSlave1: 15,
+        SensorhubSlave2: 16,
+        SensorhubSlave3: 17,
+        StepCounter:    18,
+        GameRotation:   19,
+        GeomagRotation: 20,
+        Rotation:       21,
+        SensorhubNack:  25,
+        infallible: catch-all 0,
+    },
+
+    register FIFO_STATUS {
+        address: 0x3A,
+        access: RO,
+        fields: fieldset FifoStatusFields {
+            size-bytes: 2,
+            field diff_fifo         9:0  -> u16,
+            field over_run_latched  11:11 -> bool,
+            field counter_bdr_ia    12:12 -> bool,
+            field fifo_full_ia      13:13 -> bool,
+            field fifo_ovr_ia       14:14 -> bool,
+            field fifo_wtm_ia       15:15 -> bool,
+        },
+        reset: 0,
+    },
+
+    register FIFO_DATA_OUT {
+        address: 0x78,
+        access: RO,
+        fields: fieldset FifoEntryValue {
+            size-bytes: 7,
+            field parity 0:0 -> bool,
+            field count 2:1 -> u8,
+            field sensor_tag 7:3 -> u8 as SensorTag,
+            field x_low 15:8 -> u8,
+            field x_high 23:16 -> u8,
+            field y_low 31:24 -> u8,
+            field y_high 39:32 -> u8,
+            field z_low 47:40 -> u8,
+            field z_high 55:48 -> u8,
+        },
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register FIFO_DATA_OUT_X {
+        address: 0x79,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register FIFO_DATA_OUT_Y {
+        address: 0x7B,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    register FIFO_DATA_OUT_Z {
+        address: 0x7D,
+        access: RO,
+        fields: Measurement,
+        reset: 0,
+        address-overlap: allow,
+    },
+
+    buffer FIFO_OUT {
+        address: 0x78,
+        access: RO,
+    }
+}
