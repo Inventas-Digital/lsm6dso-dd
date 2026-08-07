@@ -119,7 +119,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         shub_odr: ShubOdr,
     ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
         self.device
-            .multi_write()
+            .bulk_write()
             .with(|d| d.slv_0_add().plan())
             .with(|d| d.slv_0_subadd().plan())
             .with(|d| d.slv_0_config().plan())
@@ -471,7 +471,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn read_gyro(&mut self) -> Result<[i16; 3], crate::Lsm6dsoxError<I2c::Error>> {
         let (x, y, z) = self
             .device
-            .multi_read()
+            .bulk_read()
             .with(|d| d.outx_g().plan())
             .with(|d| d.outy_g().plan())
             .with(|d| d.outz_g().plan())
@@ -483,7 +483,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn read_acc(&mut self) -> Result<[i16; 3], crate::Lsm6dsoxError<I2c::Error>> {
         let (x, y, z) = self
             .device
-            .multi_read()
+            .bulk_read()
             .with(|d| d.outx_xl().plan())
             .with(|d| d.outy_xl().plan())
             .with(|d| d.outz_xl().plan())
