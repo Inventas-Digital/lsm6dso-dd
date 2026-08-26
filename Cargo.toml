@@ -3,6 +3,8 @@ name = "lsm6dso-dd"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+description = "An async, no_std Rust driver for the STMicroelectronics LSM6DSO 6-axis IMU"
+repository = "https://github.com/Inventas-Digital/lsm6dsox"
 
 [features]
 defmt = ["dep:defmt"]
