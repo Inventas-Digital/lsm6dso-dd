@@ -1,5 +1,5 @@
 [package]
-name = "lsm6dsox"
+name = "lsm6dso-dd"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"

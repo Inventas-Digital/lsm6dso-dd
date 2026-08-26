@@ -522,7 +522,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "lsm6dsox"
+name = "lsm6dso-dd"
 version = "0.1.0"
 dependencies = [
  "defmt",

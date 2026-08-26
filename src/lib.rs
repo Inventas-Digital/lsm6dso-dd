@@ -22,13 +22,13 @@ use embedded_hal_async;
 #[cfg(feature = "defmt")]
 device_driver::compile!(
     options: "--rust-defmt-feature=defmt",
-    manifest: "lsm6dsox.ddsl"
+    manifest: "lsm6dso.ddsl"
 );
 
 #[cfg(not(feature = "defmt"))]
 device_driver::compile!(
     options: "",
-    manifest: "lsm6dsox.ddsl"
+    manifest: "lsm6dso.ddsl"
 );
 
 impl FifoEntryValue {
@@ -80,7 +80,7 @@ impl GyroFullScale {
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[derive(thiserror::Error, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Lsm6dsoxError<I2cError> {
+pub enum Lsm6dsoError<I2cError> {
     #[error("i2c error: {0:?}")]
     I2c(I2cError),
     #[error("invalid range error")]
@@ -102,11 +102,11 @@ pub struct SensorHubSlave {
     pub batch: bool,
 }
 
-pub struct Lsm6dsox<I2c: embedded_hal_async::i2c::I2c> {
+pub struct Lsm6dso<I2c: embedded_hal_async::i2c::I2c> {
     pub device: Device<DeviceInterface<I2c>>,
 }
 
-impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
+impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dso<I2c> {
     pub fn new(i2c: I2c, addr: u8) -> Self {
         Self {
             device: Device::new(DeviceInterface { i2c, addr }),
@@ -117,7 +117,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         &mut self,
         slaves: &[SensorHubSlave],
         shub_odr: ShubOdr,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .bulk_write()
             .with(|d| d.slv_0_add().plan())
@@ -184,32 +184,32 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         Ok(())
     }
 
-    pub async fn read_who_am_i(&mut self) -> Result<[u8; 1], crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn read_who_am_i(&mut self) -> Result<[u8; 1], crate::Lsm6dsoError<I2c::Error>> {
         Ok(self.device.who_am_i().read_async().await?.into())
     }
 
     pub async fn read_status_master(
         &mut self,
-    ) -> Result<StatusMasterMainpageFields, crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<StatusMasterMainpageFields, crate::Lsm6dsoError<I2c::Error>> {
         self.device.status_master().read_async().await
     }
 
     pub async fn read_status_master_mainpage(
         &mut self,
-    ) -> Result<StatusMasterMainpageFields, crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<StatusMasterMainpageFields, crate::Lsm6dsoError<I2c::Error>> {
         self.device.status_master_mainpage().read_async().await
     }
 
     pub async fn read_fifo_status(
         &mut self,
-    ) -> Result<FifoStatusFields, crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<FifoStatusFields, crate::Lsm6dsoError<I2c::Error>> {
         self.device.fifo_status().read_async().await
     }
 
     pub async fn set_timestamp_enabled(
         &mut self,
         enable: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_10_c()
             .modify_async(|r| r.set_timestamp_en(enable))
@@ -219,7 +219,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_start_config(
         &mut self,
         trigger: ShubTrigger,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_start_config(trigger))
@@ -229,7 +229,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_shub_pu_en(
         &mut self,
         enable: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_shub_pu_en(enable))
@@ -239,7 +239,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_master_on(
         &mut self,
         enable: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_master_on(enable))
@@ -249,16 +249,14 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_aux_sens_on(
         &mut self,
         sensors: AuxSensors,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_aux_sens_on(sensors))
             .await
     }
 
-    pub async fn reset_sensor_hub_master(
-        &mut self,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn reset_sensor_hub_master(&mut self) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_rst_master_regs(true))
@@ -275,7 +273,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_acc_batch_rate(
         &mut self,
         rate: BatchDataRate,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .fifo_ctrl_3()
             .modify_async(|r| r.set_bdr_xl(rate))
@@ -285,7 +283,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_gyro_batch_rate(
         &mut self,
         rate: BatchDataRate,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .fifo_ctrl_3()
             .modify_async(|r| r.set_bdr_gy(rate))
@@ -295,7 +293,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_fifo_mode(
         &mut self,
         mode: FifoMode,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .fifo_ctrl_4()
             .modify_async(|r| r.set_fifo_mode(mode))
@@ -305,7 +303,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_ts_decimation(
         &mut self,
         decimation: TimestampDecimation,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .fifo_ctrl_4()
             .modify_async(|r| r.set_odr_ts_batch(decimation))
@@ -315,7 +313,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_temp_batch_rate(
         &mut self,
         rate: TemperatureBatchRate,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .fifo_ctrl_4()
             .modify_async(|r| r.set_odr_t_batch(rate))
@@ -325,14 +323,14 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_pass_through_mode(
         &mut self,
         enable: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .master_config()
             .modify_async(|r| r.set_pass_through_mode(enable))
             .await
     }
 
-    pub async fn sw_reset(&mut self) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn sw_reset(&mut self) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_3_c()
             .modify_async(|r| r.set_sw_reset(true))
@@ -344,7 +342,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_shub_reg_access(
         &mut self,
         enable: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .func_cfg_access()
             .modify_async(|r| {
@@ -357,7 +355,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_acc_odr(
         &mut self,
         odr: AccelOdr,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_1_xl()
             .modify_async(|r| r.set_odr_xl(odr))
@@ -367,7 +365,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_gyro_odr(
         &mut self,
         odr: GyroOdr,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_2_g()
             .modify_async(|r| r.set_odr(odr))
@@ -377,7 +375,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn set_acc_full_scale(
         &mut self,
         full_scale: AccelFullScale,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_1_xl()
             .modify_async(|r| r.set_fs_xl(full_scale))
@@ -388,7 +386,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         &mut self,
         full_scale: GyroFullScale,
         fs_125: bool,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         self.device
             .ctrl_2_g()
             .modify_async(|r| {
@@ -401,7 +399,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
     pub async fn drain_fifo(
         &mut self,
         buf: &mut [u8],
-    ) -> Result<u16, crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<u16, crate::Lsm6dsoError<I2c::Error>> {
         let fifo_status = self.device.fifo_status().read_async().await?;
         let count = fifo_status.diff_fifo();
         let word_count = (count as usize).min(buf.len() / 7);
@@ -432,7 +430,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
 
     pub async fn with_passthrough<F, T, E>(&mut self, body: F) -> Result<T, E>
     where
-        E: From<crate::Lsm6dsoxError<I2c::Error>>,
+        E: From<crate::Lsm6dsoError<I2c::Error>>,
         F: AsyncFnOnce(&mut I2c) -> Result<T, E>,
     {
         self.device
@@ -455,7 +453,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
 
     pub async fn with_shub_reg_access<F, T, E>(&mut self, body: F) -> Result<T, E>
     where
-        E: From<crate::Lsm6dsoxError<I2c::Error>>,
+        E: From<crate::Lsm6dsoError<I2c::Error>>,
         F: AsyncFnOnce(&mut Self) -> Result<T, E>,
     {
         self.set_shub_reg_access(true).await?;
@@ -464,11 +462,11 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         out.and_then(|value| disable.map(|()| value).map_err(E::from))
     }
 
-    pub async fn read_temperature(&mut self) -> Result<i16, crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn read_temperature(&mut self) -> Result<i16, crate::Lsm6dsoError<I2c::Error>> {
         Ok(self.device.out_temp().read_async().await?.temp())
     }
 
-    pub async fn read_gyro(&mut self) -> Result<[i16; 3], crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn read_gyro(&mut self) -> Result<[i16; 3], crate::Lsm6dsoError<I2c::Error>> {
         let (x, y, z) = self
             .device
             .bulk_read()
@@ -480,7 +478,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         Ok([x.value(), y.value(), z.value()])
     }
 
-    pub async fn read_acc(&mut self) -> Result<[i16; 3], crate::Lsm6dsoxError<I2c::Error>> {
+    pub async fn read_acc(&mut self) -> Result<[i16; 3], crate::Lsm6dsoError<I2c::Error>> {
         let (x, y, z) = self
             .device
             .bulk_read()
@@ -496,9 +494,9 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
         &mut self,
         buf: &mut [u8; N],
         read_offset: u8,
-    ) -> Result<(), crate::Lsm6dsoxError<I2c::Error>> {
+    ) -> Result<(), crate::Lsm6dsoError<I2c::Error>> {
         if read_offset as usize + buf.len() > 18 {
-            return Err(Lsm6dsoxError::InvalidRange);
+            return Err(Lsm6dsoError::InvalidRange);
         }
 
         self.with_shub_reg_access(async |imu| {
@@ -512,7 +510,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
                     &mut buf[..N],
                 )
                 .await
-                .map_err(|e| Lsm6dsoxError::I2c(e))?;
+                .map_err(|e| Lsm6dsoError::I2c(e))?;
 
             Ok(())
         })
@@ -525,7 +523,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> Lsm6dsox<I2c> {
 impl<I2c: embedded_hal_async::i2c::I2c> device_driver::BufferInterfaceBase
     for DeviceInterface<I2c>
 {
-    type Error = Lsm6dsoxError<I2c::Error>;
+    type Error = Lsm6dsoError<I2c::Error>;
     type AddressType = u8;
 }
 
@@ -536,7 +534,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> device_driver::AsyncBufferInterface
         self.i2c
             .write_read(self.addr, &[address], buf)
             .await
-            .map_err(Lsm6dsoxError::I2c)?;
+            .map_err(Lsm6dsoError::I2c)?;
         debug!(
             "AsyncBufferInterface::read address=0x{:X} data={:?}",
             address, buf
@@ -555,7 +553,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> device_driver::AsyncBufferInterface
 
 impl<I2c: embedded_hal_async::i2c::I2c> RegisterInterfaceBase for DeviceInterface<I2c> {
     type AddressType = u8;
-    type Error = Lsm6dsoxError<I2c::Error>;
+    type Error = Lsm6dsoError<I2c::Error>;
 }
 
 impl<I2c: embedded_hal_async::i2c::I2c> device_driver::AsyncRegisterInterface
@@ -577,13 +575,13 @@ impl<I2c: embedded_hal_async::i2c::I2c> device_driver::AsyncRegisterInterface
         let len = data.len() + 1;
         buf[0] = address;
         buf.get_mut(1..len)
-            .ok_or(Lsm6dsoxError::WriteTooLong)?
+            .ok_or(Lsm6dsoError::WriteTooLong)?
             .copy_from_slice(data);
 
         self.i2c
             .write(self.addr, &buf[..len])
             .await
-            .map_err(Lsm6dsoxError::I2c)
+            .map_err(Lsm6dsoError::I2c)
     }
 
     async fn read_register(
@@ -596,7 +594,7 @@ impl<I2c: embedded_hal_async::i2c::I2c> device_driver::AsyncRegisterInterface
             .i2c
             .write_read(self.addr, &[address], data)
             .await
-            .map_err(Lsm6dsoxError::I2c);
+            .map_err(Lsm6dsoError::I2c);
         debug!("read_register address=0x{:X} data={:?}", address, data);
         result
     }
@@ -677,7 +675,7 @@ mod tests {
                 fifo_response.extend_from_slice(&entry);
             }
             mock.push_response(fifo_response);
-            let mut lsm6dso = Lsm6dsox::new(mock, 0x6A);
+            let mut lsm6dso = Lsm6dso::new(mock, 0x6A);
             let mut buf = [0u8; FIFO_WORDS as usize * 7];
             let count = lsm6dso.drain_fifo(&mut buf).await.unwrap();
 
@@ -691,7 +689,7 @@ mod tests {
             let mut mock = I2cMock::new();
             const WHO_AM_I_RESPONSE: [u8; 1] = [0x6C];
             mock.push_response(&WHO_AM_I_RESPONSE);
-            let mut lsm6dso = Lsm6dsox::new(mock, 0x6A);
+            let mut lsm6dso = Lsm6dso::new(mock, 0x6A);
             let result = lsm6dso.read_who_am_i().await.unwrap();
             assert_eq!(result, WHO_AM_I_RESPONSE);
         });
@@ -705,7 +703,7 @@ mod tests {
             // Value returned for the read phase of the read-modify-write.
             mock.push_response([0x00]);
 
-            let mut lsm6dso = Lsm6dsox::new(mock, 0x6A);
+            let mut lsm6dso = Lsm6dso::new(mock, 0x6A);
             lsm6dso
                 .set_acc_full_scale(AccelFullScale::Scale4G)
                 .await
@@ -729,7 +727,7 @@ mod tests {
             let mut mock = I2cMock::new();
             mock.push_response([0x00]);
 
-            let mut lsm6dso = Lsm6dsox::new(mock, 0x6A);
+            let mut lsm6dso = Lsm6dso::new(mock, 0x6A);
             let slaves = [SensorHubSlave {
                 address: 0x1E,
                 register: 0x28,

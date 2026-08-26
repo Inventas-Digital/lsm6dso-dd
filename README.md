@@ -1,18 +1,18 @@
-# lsm6dsox
+# lsm6dso-dd
 
-An async, `no_std` Rust driver for the STMicroelectronics **LSM6DSO / LSM6DSOX**
+An async, `no_std` Rust driver for the STMicroelectronics **LSM6DSO**
 6-axis IMU.
 
 This driver uses [`device-driver`](https://github.com/diondokter/device-driver).
-This makes it possible to describe the register map declaratively in [`lsm6dsox.ddsl`](lsm6dsox.ddsl)
+This makes it possible to describe the register map declaratively in [`lsm6dso.ddsl`](lsm6dso.ddsl)
 and generate the typed register access functions at build time.
 
 ## Usage sketch
 
 ```rust
-let mut imu = Lsm6dsox::new(i2c, 0x6A);
+let mut imu = Lsm6dso::new(i2c, 0x6A);
 imu.sw_reset().await?;
-let who = imu.read_who_am_i().await?;      // expect 0x6C on LSM6DSOX
+let who = imu.read_who_am_i().await?;
 
 imu.set_acc_odr(AccelOdr::Rate104Hz).await?;
 imu.set_acc_full_scale(AccelFullScale::Scale4G).await?;
