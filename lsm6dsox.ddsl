@@ -1,6 +1,5 @@
 
 device Device {
-    byte-order: LE,
     register-address-type: u8,
     register-address-mode: mapped,
     buffer-address-type: u8,
@@ -10,6 +9,7 @@ device Device {
         access: RW,
         fields: fieldset FuncCfgAccessFields {
             size-bytes: 1,
+            default-access: RW,
             field shub_reg_access 6:6 -> bool,
             field func_cfg_access 7:7 -> bool,
         },
@@ -21,6 +21,7 @@ device Device {
         access: RO,
         fields: fieldset WhoAmI {
             size-bytes: 1,
+            default-access: RO,
             field who_am_i 7:0 -> u8,
         },
         reset: 0,
@@ -70,6 +71,7 @@ device Device {
         access: RW,
         fields: fieldset FifoCtrl3Fields {
             size-bytes: 1,
+            default-access: RW,
             field bdr_xl 3:0 -> u8 as BatchDataRate,
             field bdr_gy 7:4 -> u8 as BatchDataRate,
         },
@@ -106,6 +108,7 @@ device Device {
         access: RW,
         fields: fieldset FifoCtrl1Fields {
             size-bytes: 1,
+            default-access: RW,
             field watermark_threshold 7:0 -> u8,
         },
         reset: 0,
@@ -124,6 +127,7 @@ device Device {
         access: RW,
         fields: fieldset FifoCtrl2Fields {
             size-bytes: 1,
+            default-access: RW,
             field wtm_8            0:0 -> bool,
             field uncoptr_rate     2:1 -> u8 as UncompressedRate,
             field odrchg_en        4:4 -> bool,
@@ -139,6 +143,7 @@ device Device {
         access: RW,
         fields: fieldset FifoCtrl4Fields {
             size-bytes: 1,
+            default-access: RW,
             field fifo_mode    2:0 -> u8 as FifoMode,
             field odr_t_batch  5:4 -> u8 as TemperatureBatchRate,
             field odr_ts_batch 7:6 -> u8 as TimestampDecimation,
@@ -175,6 +180,7 @@ device Device {
         access: RW,
         fields: fieldset Ctrl1XlFields {
             size-bytes: 1,
+            default-access: RW,
             field lpf2_xl_en 1:1 -> bool,
             field fs_xl      3:2 -> u8 as AccelFullScale,
             field odr_xl     7:4 -> u8 as AccelOdr,
@@ -192,6 +198,7 @@ device Device {
 
     fieldset SensorHubFields {
         size-bytes: 1,
+        default-access: RO,
         field data 7:0 -> u8,
     },
 
@@ -224,6 +231,7 @@ device Device {
         access: RW,
         fields: fieldset MasterConfigFields {
             size-bytes: 1,
+            default-access: RW,
             field aux_sens_on       1:0 -> u8 as AuxSensors,
             field master_on         2:2 -> bool,
             field shub_pu_en        3:3 -> bool,
@@ -244,12 +252,14 @@ device Device {
 
     fieldset Slv0AddFields {
         size-bytes: 1,
+        default-access: RW,
         field rw_0       0:0 -> bool,
         field slave0_add 7:1 -> u8,
     },
 
     fieldset SlvAddFields {
         size-bytes: 1,
+        default-access: RW,
         field r_1       0:0 -> bool,
         field slave_add 7:1 -> u8,
     },
@@ -264,6 +274,7 @@ device Device {
 
     fieldset SlvSubaddFields {
         size-bytes: 1,
+        default-access: RW,
         field slave_reg 7:0 -> u8,
     },
 
@@ -280,6 +291,7 @@ device Device {
         access: RW,
         fields: fieldset Slv0ConfigFields {
             size-bytes: 1,
+            default-access: RW,
             field slave_numop       2:0 -> u8,
             field batch_ext_sens_en 3:3 -> bool,
             field shub_odr           7:6 -> u8 as ShubOdr,
@@ -306,6 +318,7 @@ device Device {
 
     fieldset SlvConfigFields {
         size-bytes: 1,
+        default-access: RW,
         field slave_numop     2:0 -> u8,
         field batch_ext_sens_en 3:3 -> bool,
     },
@@ -379,6 +392,7 @@ device Device {
         access: RW,
         fields: fieldset Ctrl3CFields {
             size-bytes: 1,
+            default-access: RW,
             field sw_reset  0:0 -> bool,
             field if_inc    2:2 -> bool,
             field sim       3:3 -> bool,
@@ -396,6 +410,7 @@ device Device {
         access: RW,
         fields: fieldset Ctrl10CFields {
             size-bytes: 1,
+            default-access: RW,
             field timestamp_en 5:5 -> bool,
         },
         reset: 0,
@@ -409,6 +424,7 @@ device Device {
 
         fields: fieldset CTRL2_G_Fields {
             size-bytes: 1,
+            default-access: RW,
             field ODR 7:4 -> u8 as GyroOdr,
             field FS_G 3:2 -> u8 as GyroFullScale,
             field FS_125 1:1 -> bool,
@@ -421,6 +437,7 @@ device Device {
 
         fields: fieldset StatusRegFields {
             size-bytes: 1,
+            default-access: RO,
             field xlda 0:0 -> bool,
             field gda 1:1 -> bool,
             field tda 2:2 -> bool,
@@ -430,6 +447,8 @@ device Device {
 
     fieldset Measurement {
         size-bytes: 2,
+        byte-order: LE,
+        default-access: RO,
         field value 15:0 -> i16,
     },
 
@@ -481,6 +500,8 @@ device Device {
         access: RO,
         fields: fieldset TempFieldSet {
             size-bytes: 2,
+            byte-order: LE,
+            default-access: RW,
             field temp 15:0 -> int,
         },
         reset: 0,
@@ -492,6 +513,7 @@ device Device {
         access: RO,
         fields: fieldset StatusMasterMainpageFields {
             size-bytes: 1,
+            default-access: RO,
             field sens_hub_endop 0:0 -> bool,
             field slave0_nack    3:3 -> bool,
             field slave1_nack    4:4 -> bool,
@@ -533,6 +555,8 @@ device Device {
         access: RO,
         fields: fieldset FifoStatusFields {
             size-bytes: 2,
+            byte-order: LE,
+            default-access: RO,
             field diff_fifo         9:0  -> u16,
             field over_run_latched  11:11 -> bool,
             field counter_bdr_ia    12:12 -> bool,
@@ -548,6 +572,8 @@ device Device {
         access: RO,
         fields: fieldset FifoEntryValue {
             size-bytes: 7,
+            byte-order: LE,
+            default-access: RO,
             field parity 0:0 -> bool,
             field count 2:1 -> u8,
             field sensor_tag 7:3 -> u8 as SensorTag,

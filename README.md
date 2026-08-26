@@ -3,10 +3,9 @@
 An async, `no_std` Rust driver for the STMicroelectronics **LSM6DSO / LSM6DSOX**
 6-axis IMU.
 
-This driver uses a cutting-edge version of the
-[`device-driver`](https://github.com/diondokter/device-driver) crate. This makes it possible
-to describe the register map declaratively in [`lsm6dsox.ddsl`](lsm6dsox.ddsl) and
-generate the typed register access functions at build time.
+This driver uses [`device-driver`](https://github.com/diondokter/device-driver).
+This makes it possible to describe the register map declaratively in [`lsm6dsox.ddsl`](lsm6dsox.ddsl)
+and generate the typed register access functions at build time.
 
 ## Usage sketch
 
