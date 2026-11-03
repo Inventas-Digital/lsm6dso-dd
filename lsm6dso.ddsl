@@ -30,7 +30,7 @@ device Device {
 
     enum GyroOdr {
         PowerDown:     0b0000,
-        Rate_12_5_Hz:  0b0001,
+        Rate_12p5_Hz: 0b0001,
         Rate_26_Hz:    0b0010,
         Rate_52_Hz:    0b0011,
         Rate_104_Hz:   0b0100,
@@ -52,7 +52,7 @@ device Device {
 
     enum BatchDataRate {
         NotBatched:   0b0000,
-        Rate_12_5_Hz: 0b0001,
+        Rate_12p5_Hz: 0b0001,
         Rate_26_Hz:   0b0010,
         Rate_52_Hz:   0b0011,
         Rate_104_Hz:  0b0100,
@@ -92,7 +92,7 @@ device Device {
     enum TemperatureBatchRate {
         Disabled:     0,
         Rate_1_6_Hz:  1,
-        Rate_12_5_Hz: 2,
+        Rate_12p5_Hz: 2,
         Rate_52_Hz:   3,
     },
 
@@ -155,7 +155,7 @@ device Device {
     enum AccelOdr {
         PowerDown:    0b0000,
         Rate_1_6_Hz:  0b1011,
-        Rate_12_5_Hz: 0b0001,
+        Rate_12p5_Hz: 0b0001,
         Rate_26_Hz:   0b0010,
         Rate_52_Hz:   0b0011,
         Rate_104_Hz:  0b0100,
@@ -247,7 +247,7 @@ device Device {
         Rate_104_Hz:  0b00,
         Rate_52_Hz:   0b01,
         Rate_26_Hz:   0b10,
-        Rate_12_5_Hz: 0b11,
+        Rate_12p5_Hz: 0b11,
     },
 
     fieldset Slv0AddFields {
