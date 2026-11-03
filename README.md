@@ -31,7 +31,6 @@ let g = raw[0] as f32 * AccelFullScale::Scale4G.sensitivity_g();
 - [ ] Filter-chain configuration
 - [ ] Finite state machine
 - [ ] OIS (optical image stabilization) output
-- [ ] Machine learning core
 
 ## License
 
