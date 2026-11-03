@@ -1,4 +1,4 @@
 fn main() {
     println!("cargo::rerun-if-changed=build.rs");
-    println!("cargo::rerun-if-changed=dso6lsm.ddsl");
+    println!("cargo::rerun-if-changed=device.ddsl");
 }

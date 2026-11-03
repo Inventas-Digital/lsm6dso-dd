@@ -22,13 +22,13 @@ use embedded_hal_async;
 #[cfg(feature = "defmt")]
 device_driver::compile!(
     options: "--rust-defmt-feature=defmt",
-    manifest: "lsm6dso.ddsl"
+    manifest: "device.ddsl"
 );
 
 #[cfg(not(feature = "defmt"))]
 device_driver::compile!(
     options: "",
-    manifest: "lsm6dso.ddsl"
+    manifest: "device.ddsl"
 );
 
 impl FifoEntryValue {
