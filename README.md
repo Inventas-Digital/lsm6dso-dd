@@ -10,7 +10,7 @@ and generate the typed register access functions at build time.
 ## Usage sketch
 
 ```rust
-let mut imu = Lsm6dso::new(i2c, 0x6A);
+let mut imu = Lsm6dso::new_i2c(i2c, 0x6A);
 imu.sw_reset().await?;
 let who = imu.read_who_am_i().await?;
 
@@ -27,7 +27,7 @@ let g = raw[0] as f32 * AccelFullScale::Scale4G.sensitivity_g();
 - [x] I²C
 - [x] FIFO batching
 - [x] Sensor hub (I²C master)
-- [ ] SPI
+- [x] SPI
 - [ ] Filter-chain configuration
 - [ ] Finite state machine
 - [ ] OIS (optical image stabilization) output

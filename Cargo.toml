@@ -17,4 +17,5 @@ defmt = { version = "1", optional = true }
 device-driver = { version ="2", features = ["macros"] }
 
 embedded-hal-async = "1.0.0"
+st-mems-bus = "2.0.1"
 thiserror = { version = "2.0.3", default-features = false }
